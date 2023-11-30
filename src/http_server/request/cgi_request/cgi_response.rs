@@ -1,20 +1,17 @@
-use http::{
-    Response,
-    StatusCode, Request,
-};
+use http::{Request, Response, StatusCode};
 
 use std::{
     collections::HashMap,
-    str::{
-        FromStr,
-        Lines,
-    },
     net::TcpStream,
+    str::{FromStr, Lines},
 };
 
 use log::debug;
 
-use crate::http_server::{request::{static_request::static_handler::StaticRequestHandler, request::RequestHandler}, response::generate_error_response};
+use crate::http_server::{
+    request::{request::RequestHandler, static_request::static_handler::StaticRequestHandler},
+    response::generate_error_response,
+};
 
 #[derive(strum_macros::EnumString, Eq, Hash, PartialEq, Debug)]
 #[strum(serialize_all = "Train-Case", ascii_case_insensitive)]
@@ -37,12 +34,10 @@ impl CGIScriptResponse {
     }
 }
 
-fn parse_cgi_headers(cgi_output: &mut Lines) ->
-    Result<CGIResponseHeaderMap, ()> {
+fn parse_cgi_headers(cgi_output: &mut Lines) -> Result<CGIResponseHeaderMap, ()> {
+    let mut headers = CGIResponseHeaderMap::new();
 
-     let mut headers = CGIResponseHeaderMap::new();
-
-     loop {
+    loop {
         let next_line = if let Some(line_result) = cgi_output.next() {
             line_result
         } else {
@@ -59,7 +54,7 @@ fn parse_cgi_headers(cgi_output: &mut Lines) ->
             None => {
                 debug!("Invalid CGI header");
                 return Err(());
-            },
+            }
             Some((before, after)) => {
                 let header_value = CGIResponseHeader::from_str(before);
 
@@ -70,30 +65,25 @@ fn parse_cgi_headers(cgi_output: &mut Lines) ->
                 }
             }
         }
-    }   
+    }
 
     Ok(headers)
 }
 
-pub fn parse_cgi_response(
-    cgi_output: String
-) -> Result<CGIScriptResponse, ()> {
+pub fn parse_cgi_response(cgi_output: String) -> Result<CGIScriptResponse, ()> {
     let mut output_lines = cgi_output.lines();
     let response_headers = parse_cgi_headers(&mut output_lines);
     let response_headers = match response_headers {
-        Err(_) => {
-            return Err(())
-        },
-        Ok(headers) => headers
+        Err(_) => return Err(()),
+        Ok(headers) => headers,
     };
 
     let response_body = output_lines.collect::<String>();
     Ok(CGIScriptResponse::new(response_headers, response_body))
 }
 
-
 fn local_redirect(
-    stream: &TcpStream, 
+    stream: &TcpStream,
     static_handler: &StaticRequestHandler,
     location: &str,
 ) -> Response<String> {
@@ -103,57 +93,44 @@ fn local_redirect(
         .body(String::from(""));
 
     match static_request {
-        Err(_) => generate_error_response(
-            StatusCode::INTERNAL_SERVER_ERROR
-        ),
+        Err(_) => generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
         Ok(static_request) => {
-            let response = static_handler.handle_request(
-                stream,
-                &static_request
-            );
+            let response = static_handler.handle_request(stream, &static_request);
 
             match response {
-                None => generate_error_response(
-                    StatusCode::INTERNAL_SERVER_ERROR
-                ),
-                Some(response) => response
+                None => generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
+                Some(response) => response,
             }
         }
     }
 }
 
 fn client_redirect(location: &str) -> Response<String> {
-    let response = Response::builder().status(StatusCode::FOUND)
+    let response = Response::builder()
+        .status(StatusCode::FOUND)
         .header("location", location)
         .body(String::from(""));
 
     match response {
         Err(_) => generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
-        Ok(response) => response
+        Ok(response) => response,
     }
 }
 
-fn document_response(
-    headers: CGIResponseHeaderMap,
-    body: String
-) -> Response<String> {
+fn document_response(headers: CGIResponseHeaderMap, body: String) -> Response<String> {
     let status = match headers.get(&CGIResponseHeader::Status) {
         None => String::from(StatusCode::OK.as_str()),
-        Some(status) => status.clone()
+        Some(status) => status.clone(),
     };
 
     let status = match StatusCode::from_str(status.as_str()) {
-        Err(_) => return generate_error_response(
-            StatusCode::INTERNAL_SERVER_ERROR
-        ),
-        Ok(value) => value
+        Err(_) => return generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
+        Ok(value) => value,
     };
 
     let content_type = match headers.get(&CGIResponseHeader::ContentType) {
-        None => return generate_error_response(
-            StatusCode::INTERNAL_SERVER_ERROR
-        ),
-        Some(value) => value
+        None => return generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
+        Some(value) => value,
     };
 
     let response = Response::builder()
@@ -163,12 +140,12 @@ fn document_response(
 
     match response {
         Err(_) => generate_error_response(StatusCode::INTERNAL_SERVER_ERROR),
-        Ok(response) => response
+        Ok(response) => response,
     }
 }
 
 pub fn convert_cgi_response_to_http(
-    stream: &TcpStream, 
+    stream: &TcpStream,
     static_handler: &StaticRequestHandler,
     cgi_response: CGIScriptResponse,
 ) -> Response<String> {
@@ -186,4 +163,3 @@ pub fn convert_cgi_response_to_http(
         document_response(response_headers, response_body)
     }
 }
-

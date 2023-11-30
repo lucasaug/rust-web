@@ -1,6 +1,8 @@
 use std::{collections::HashMap, ffi::OsStr};
 
-#[derive(strum_macros::Display, strum_macros::IntoStaticStr, strum_macros::AsRefStr, Eq, Hash, PartialEq)]
+#[derive(
+    strum_macros::Display, strum_macros::IntoStaticStr, strum_macros::AsRefStr, Eq, Hash, PartialEq,
+)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 pub enum CGIMetavariable {
     AuthType,

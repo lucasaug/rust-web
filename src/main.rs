@@ -1,7 +1,6 @@
 use std::net::TcpListener;
 use std::sync::Arc;
 
-use rust_web::threadpool::ThreadPool;
 use rust_web::http_server::{
     connection::ConnectionHandler,
     request::{
@@ -9,6 +8,7 @@ use rust_web::http_server::{
         static_request::static_handler::StaticRequestHandler,
     },
 };
+use rust_web::threadpool::ThreadPool;
 
 const ADDR_AND_PORT: &str = "127.0.0.1:8080";
 const POOL_SIZE: usize = 4;
@@ -22,11 +22,11 @@ fn main() {
     let listener = TcpListener::bind(ADDR_AND_PORT).unwrap();
     let pool = ThreadPool::new(POOL_SIZE);
 
-    let conn_handler = Arc::new(ConnectionHandler::new(vec! [
+    let conn_handler = Arc::new(ConnectionHandler::new(vec![
         Box::new(CgiRequestHandler::new(
             String::from(CGI_PATH),
             String::from(CGI_FOLDER),
-            StaticRequestHandler::new()
+            StaticRequestHandler::new(),
         )),
         Box::new(StaticRequestHandler::new()),
     ]));
@@ -44,4 +44,3 @@ fn main() {
 
     println!("Shutting down.");
 }
-

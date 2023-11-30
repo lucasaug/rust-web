@@ -1,26 +1,13 @@
-use std::{
-    io::prelude::*,
-    net::TcpStream,
-};
+use std::{io::prelude::*, net::TcpStream};
 
-use http::{
-    Request,
-    Response, StatusCode,
-};
+use http::{Request, Response, StatusCode};
 
-
-use log::{
-    info,
-    debug,
-};
+use log::{debug, info};
 
 use crate::http_server::{
-    response::response_to_string,
-    request::request::{
-        load_request,
-        RequestHandler,
-    },
+    request::request::{load_request, RequestHandler},
     response::generate_error_response,
+    response::response_to_string,
 };
 
 type RequestHandlerList = Vec<Box<dyn RequestHandler<String> + Sync + Send>>;
@@ -34,11 +21,12 @@ impl ConnectionHandler {
         ConnectionHandler { request_handlers }
     }
 
-    pub fn handle_request(
-            &self,
-            request: Request<String>,
-            stream: &TcpStream
-    ) -> Response<String> {
+    /// Handles a single incoming HTTP request using a suitable handler.
+    ///
+    /// Receives the request information as well as the TCP Stream from which
+    /// the request was read. Handlers supplied to the ConnectionHandler are
+    /// tried in order, and the first `Some` response available is returned.
+    pub fn handle_request(&self, request: Request<String>, stream: &TcpStream) -> Response<String> {
         let mut response = None;
         for handler in &self.request_handlers {
             response = response.or(handler.handle_request(stream, &request));
@@ -47,9 +35,8 @@ impl ConnectionHandler {
             }
         }
 
-        let mut response = response.unwrap_or(
-            generate_error_response(StatusCode::INTERNAL_SERVER_ERROR)
-        );
+        let mut response =
+            response.unwrap_or(generate_error_response(StatusCode::INTERNAL_SERVER_ERROR));
 
         if request.method() == "HEAD" {
             *response.body_mut() = String::from("");
@@ -64,19 +51,19 @@ impl ConnectionHandler {
         debug!("{:?}", request);
 
         let response = match request {
-           Ok(request) => self.handle_request(request, &stream),
-           Err(status) => generate_error_response(status),
+            Ok(request) => self.handle_request(request, &stream),
+            Err(status) => generate_error_response(status),
         };
 
         let response_text = response_to_string(response);
         info!("Writing response");
         debug!("Response: \n{response_text}\n");
 
-        stream.write_all(response_text.as_bytes())
+        stream
+            .write_all(response_text.as_bytes())
             .expect("Error writing response to the TCP Stream");
         stream.flush().expect("Error flushing TCP stream");
 
         info!("Finished writing response");
     }
 }
-

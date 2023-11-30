@@ -1,4 +1,4 @@
-use http::{ Response, StatusCode};
+use http::{Response, StatusCode};
 
 pub fn generate_error_response(status_code: StatusCode) -> Response<String> {
     let mut response = Response::new(String::from(""));
@@ -15,8 +15,7 @@ pub fn response_to_string(response: Response<String>) -> String {
 
     let mut header_line = String::from("");
     for (header_name, header_value) in response.headers() {
-        let header_value = header_value.to_str()
-            .expect("Invalid response header");
+        let header_value = header_value.to_str().expect("Invalid response header");
         let header = format!("{header_name}: {header_value}\r\n");
         header_line.push_str(&header);
     }
@@ -25,4 +24,3 @@ pub fn response_to_string(response: Response<String>) -> String {
 
     format!("{status_line}\r\n{header_line}\r\n{contents}")
 }
-

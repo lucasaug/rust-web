@@ -1,4 +1,3 @@
-
 use std::{
     sync::{mpsc, Arc, Mutex},
     thread,
@@ -31,9 +30,20 @@ impl ThreadPool {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
         }
 
-        ThreadPool { workers, sender: Some(sender) }
+        ThreadPool {
+            workers,
+            sender: Some(sender),
+        }
     }
 
+    /// Executes a function call in one of the threads in the pool.
+    ///
+    /// The f parameter is the function to be executed.
+    ///
+    /// # Panics
+    ///
+    /// The `execute` function will panic if the sender is None or the receiver
+    /// is dropped.
     pub fn execute<F>(&self, f: F)
     where
         F: FnOnce() + Send + 'static,
@@ -64,6 +74,13 @@ struct Worker {
 }
 
 impl Worker {
+    /// Creates a new worker with a given id and channel receiver. Received
+    /// functions are executed by the worker.
+    ///
+    /// # Panics
+    ///
+    /// The returned Worker will panic if the mutex can no longer be acquired
+    /// (e.g. another user of this mutex panicked while holding the mutex).
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
             let message = receiver
@@ -82,9 +99,11 @@ impl Worker {
                     break;
                 }
             }
-
         });
 
-        Worker { id, thread: Some(thread) }
+        Worker {
+            id,
+            thread: Some(thread),
+        }
     }
 }
