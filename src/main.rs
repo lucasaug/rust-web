@@ -1,14 +1,14 @@
 use std::net::TcpListener;
 use std::sync::Arc;
 
-use rust_web::http_server::{
+use rust_web_cgi::http_server::{
     connection::ConnectionHandler,
     request::{
         cgi_request::cgi_handler::CgiRequestHandler,
         static_request::static_handler::StaticRequestHandler,
     },
 };
-use rust_web::threadpool::ThreadPool;
+use rust_web_cgi::threadpool::ThreadPool;
 
 const ADDR_AND_PORT: &str = "127.0.0.1:8080";
 const POOL_SIZE: usize = 4;

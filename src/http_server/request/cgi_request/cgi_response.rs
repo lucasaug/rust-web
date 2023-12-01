@@ -23,6 +23,7 @@ pub enum CGIResponseHeader {
 
 pub type CGIResponseHeaderMap = HashMap<CGIResponseHeader, String>;
 
+#[derive(Debug, PartialEq)]
 pub struct CGIScriptResponse {
     headers: CGIResponseHeaderMap,
     body: String,
@@ -61,7 +62,7 @@ fn parse_cgi_headers(cgi_output: &mut Lines) -> Result<CGIResponseHeaderMap, ()>
                 let header_value = CGIResponseHeader::from_str(before);
 
                 if let Ok(header_key) = header_value {
-                    headers.insert(header_key, after.to_string());
+                    headers.insert(header_key, after.trim().to_string());
                 } else if let Err(_) = header_value {
                     debug!("Couldn't parse header: {:?}", before);
                 }
@@ -176,5 +177,32 @@ pub fn convert_cgi_response_to_http(
         }
     } else {
         document_response(response_headers, response_body)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cgi_response_is_properly_parsed() {
+        let mock_cgi_output = String::from("\
+            Content-Type: text/html\n\n\
+            Hello!\
+        ");
+        let result = parse_cgi_response(mock_cgi_output);
+
+        let cgi_response = result.unwrap();
+
+        let expected_headers = CGIResponseHeaderMap::from([
+            (CGIResponseHeader::ContentType, String::from("text/html")),
+        ]);
+
+        let expected = CGIScriptResponse::new(
+            expected_headers,
+            String::from("Hello!")
+        );
+
+        assert_eq!(cgi_response, expected);
     }
 }
