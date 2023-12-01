@@ -46,6 +46,9 @@ impl CgiRequestHandler {
     }
 }
 
+/// Helper function which returns the value of an HTTP request header if it is
+/// present. Otherwise returns an empty string.
+///
 fn get_header_or_empty_string(request: &Request<String>, header_name: HeaderName) -> String {
     request
         .headers()
@@ -53,6 +56,10 @@ fn get_header_or_empty_string(request: &Request<String>, header_name: HeaderName
         .map_or(String::from(""), |h| h.to_str().unwrap_or("").to_string())
 }
 
+/// Runs the CGI program located at `script_path` with the given `input_data`,
+/// setting up the supplied environment variables. Returns the CGI program
+/// output if successful. Otherwise returns the error.
+///
 fn run_process(
     script_path: PathBuf,
     input_data: &String,
@@ -82,6 +89,10 @@ fn run_process(
 }
 
 impl CgiRequestHandler {
+    /// Creates a CGI metavariable map to be sent to the CGI program via
+    /// environment variables. The data in the map is extracted from the
+    /// incoming TCP stream an HTTP request.
+    ///
     fn generate_environment_variables(
         &self,
         stream: &TcpStream,
@@ -169,6 +180,10 @@ impl CgiRequestHandler {
         return metavariables;
     }
 
+    /// Orchestrates the whole execution of the CGI program: sets the
+    /// environment, runs the code, parses the response and generates the
+    /// proper HTTP response
+    ///
     fn run_cgi_script(
         &self,
         stream: &TcpStream,
@@ -195,6 +210,16 @@ impl CgiRequestHandler {
 }
 
 impl RequestHandler<String> for CgiRequestHandler {
+    /// Handles an incoming request. If the requested path matches the
+    /// expected CGI path, runs the CGI script and returns a response.
+    /// Otherwise returns a `None` value so that the next handler can try to
+    /// process the request.
+    ///
+    /// # Panics
+    ///
+    /// The `handle_request` method panics if the `CGI_FOLDER` path does not
+    /// exist.
+    ///
     fn handle_request(
         &self,
         stream: &TcpStream,

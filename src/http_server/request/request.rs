@@ -7,9 +7,19 @@ use log::debug;
 const BUFFER_SIZE: usize = 8 * 1024; // 8KB
 
 pub trait RequestHandler<T> {
+    /// The `handle_request` trait method should return None if the
+    /// corresponding handler shouldn't handle the supplied request. Otherwise
+    /// it should return the correct response.
+    ///
     fn handle_request(&self, stream: &TcpStream, request: &Request<T>) -> Option<Response<T>>;
 }
 
+/// The `handle_request` function reads in an HTTP request from the given TCP
+/// stream and returns it. If a valid request can't be read, the HTTP status
+/// to be sent back is returned, wrapped into an `Err` instance. Input from the
+/// TCP stream is expected to be UTF-8 encoded data. If this isn't the case,
+/// a BAD REQUEST status code is returned.
+///
 pub fn load_request(mut stream: &TcpStream) -> Result<Request<String>, StatusCode> {
     let mut buffer = [0; BUFFER_SIZE + 1];
     if let Err(_) = stream.read(&mut buffer) {

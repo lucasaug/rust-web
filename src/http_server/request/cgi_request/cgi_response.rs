@@ -34,6 +34,8 @@ impl CGIScriptResponse {
     }
 }
 
+/// Extracts the CGI headers returned from the CGI script.
+///
 fn parse_cgi_headers(cgi_output: &mut Lines) -> Result<CGIResponseHeaderMap, ()> {
     let mut headers = CGIResponseHeaderMap::new();
 
@@ -70,6 +72,8 @@ fn parse_cgi_headers(cgi_output: &mut Lines) -> Result<CGIResponseHeaderMap, ()>
     Ok(headers)
 }
 
+/// Extracts the CGI response from the CGI script output
+///
 pub fn parse_cgi_response(cgi_output: String) -> Result<CGIScriptResponse, ()> {
     let mut output_lines = cgi_output.lines();
     let response_headers = parse_cgi_headers(&mut output_lines);
@@ -82,6 +86,8 @@ pub fn parse_cgi_response(cgi_output: String) -> Result<CGIScriptResponse, ()> {
     Ok(CGIScriptResponse::new(response_headers, response_body))
 }
 
+/// Converts a CGI Local Redirect response into the corresponding HTTP response
+///
 fn local_redirect(
     stream: &TcpStream,
     static_handler: &StaticRequestHandler,
@@ -105,6 +111,9 @@ fn local_redirect(
     }
 }
 
+/// Converts a CGI Client Redirect response into the corresponding HTTP
+/// response
+///
 fn client_redirect(location: &str) -> Response<String> {
     let response = Response::builder()
         .status(StatusCode::FOUND)
@@ -117,6 +126,8 @@ fn client_redirect(location: &str) -> Response<String> {
     }
 }
 
+/// Converts a CGI Document response into the corresponding HTTP response
+///
 fn document_response(headers: CGIResponseHeaderMap, body: String) -> Response<String> {
     let status = match headers.get(&CGIResponseHeader::Status) {
         None => String::from(StatusCode::OK.as_str()),
@@ -144,6 +155,10 @@ fn document_response(headers: CGIResponseHeaderMap, body: String) -> Response<St
     }
 }
 
+/// Converts a CGI response into the corresponding HTTP response. The type of
+/// CGI response is inferred by the CGI headers present in the CGI script
+/// output.
+///
 pub fn convert_cgi_response_to_http(
     stream: &TcpStream,
     static_handler: &StaticRequestHandler,

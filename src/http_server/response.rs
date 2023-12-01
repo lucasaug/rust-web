@@ -1,5 +1,7 @@
 use http::{Response, StatusCode};
 
+/// Generates an empty HTTP response with a given status code
+///
 pub fn generate_error_response(status_code: StatusCode) -> Response<String> {
     let mut response = Response::new(String::from(""));
     *response.status_mut() = status_code;
@@ -7,6 +9,14 @@ pub fn generate_error_response(status_code: StatusCode) -> Response<String> {
     return response;
 }
 
+/// Converts a structured HTTP response into the text data to be sent back to
+/// the requesting client
+///
+/// # Panics
+///
+/// The `response_to_string` function will panic if the given response has any
+/// headers that can't be converted to a string.
+///
 pub fn response_to_string(response: Response<String>) -> String {
     let status = response.status();
     let status_value = status.as_str();

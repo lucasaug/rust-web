@@ -23,7 +23,7 @@ impl ConnectionHandler {
 
     /// Handles a single incoming HTTP request using a suitable handler.
     ///
-    /// Receives the request information as well as the TCP Stream from which
+    /// Receives the request information as well as the TCP stream from which
     /// the request was read. Handlers supplied to the ConnectionHandler are
     /// tried in order, and the first `Some` response available is returned.
     pub fn handle_request(&self, request: Request<String>, stream: &TcpStream) -> Response<String> {
@@ -45,6 +45,14 @@ impl ConnectionHandler {
         response
     }
 
+    /// Reads an HTTP request from a TCP stream and writes the corresponding
+    /// response back to it.
+    ///
+    /// # Panics
+    ///
+    /// The `handle_connection` method panics if the stream can't be written to
+    /// or flushed (for instance if it was closed).
+    ///
     pub fn handle_connection(&self, mut stream: TcpStream) {
         info!("New request received");
         let request = load_request(&mut stream);

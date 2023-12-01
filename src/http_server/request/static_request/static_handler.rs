@@ -17,6 +17,18 @@ impl StaticRequestHandler {
 }
 
 impl RequestHandler<String> for StaticRequestHandler {
+    /// Handles an incoming request. Always returns a `Some` variant, since the
+    /// static handler is kind of a fallback handler. If the requested page
+    /// isn't available, it should return a 404 response.
+    ///
+    /// # Panics
+    ///
+    /// The `handle_request` method panics if the `STATIC_FOLDER` path does not
+    /// exist, or if it encounters a problem during the building of the HTTP
+    /// response (which shouldn't happen since an incorrect header would be the
+    /// only possible problem in this case, and the response headers for static
+    /// requests are hard-coded).
+    ///
     fn handle_request(
         &self,
         _stream: &TcpStream,
