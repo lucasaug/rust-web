@@ -1,8 +1,8 @@
 #!/bin/bash
 
 read INDATA
-echo "Content-Type: text/html\n\n"
-echo "Stdin data: ${INDATA}<br />"
+printf "Content-Type: text/html\n\n"
+printf "Stdin data: ${INDATA}<br />"
 export VAR=$(env)
-echo "${VAR//$'\n'/<br />}"
+printf "${VAR//$'\n'/<br />}"
 
