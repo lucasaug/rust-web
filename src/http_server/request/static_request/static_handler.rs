@@ -6,13 +6,13 @@ use log::debug;
 
 use crate::http_server::{request::request::RequestHandler, response::generate_error_response};
 
-const STATIC_FOLDER: &str = "public_html";
-
-pub struct StaticRequestHandler {}
+pub struct StaticRequestHandler {
+    static_folder: String,
+}
 
 impl StaticRequestHandler {
-    pub fn new() -> StaticRequestHandler {
-        StaticRequestHandler {}
+    pub fn new(static_folder: String) -> StaticRequestHandler {
+        StaticRequestHandler { static_folder }
     }
 }
 
@@ -23,11 +23,11 @@ impl RequestHandler<String> for StaticRequestHandler {
     ///
     /// # Panics
     ///
-    /// The `handle_request` method panics if the `STATIC_FOLDER` path does not
-    /// exist, or if it encounters a problem during the building of the HTTP
-    /// response (which shouldn't happen since an incorrect header would be the
-    /// only possible problem in this case, and the response headers for static
-    /// requests are hard-coded).
+    /// The `handle_request` method panics if the `self.static_folder` path
+    /// does not exist, or if it encounters a problem during the building of
+    /// the HTTP response (which shouldn't happen since an incorrect header
+    /// would be the only possible problem in this case, and the response
+    /// headers for static requests are hard-coded).
     ///
     fn handle_request(
         &self,
@@ -46,8 +46,8 @@ impl RequestHandler<String> for StaticRequestHandler {
         };
 
         let static_folder_path =
-            fs::canonicalize(STATIC_FOLDER).expect("Static files path does not exist");
-        let file_path = fs::canonicalize(Path::new(STATIC_FOLDER).join(file_path));
+            fs::canonicalize(&self.static_folder).expect("Static files path does not exist");
+        let file_path = fs::canonicalize(Path::new(&self.static_folder).join(file_path));
         let abs_file_path = match file_path {
             Err(_) => return Some(generate_error_response(StatusCode::NOT_FOUND)),
             Ok(path) => {

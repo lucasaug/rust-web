@@ -186,22 +186,22 @@ mod tests {
 
     #[test]
     fn cgi_response_is_properly_parsed() {
-        let mock_cgi_output = String::from("\
+        let mock_cgi_output = String::from(
+            "\
             Content-Type: text/html\n\n\
             Hello!\
-        ");
+        ",
+        );
         let result = parse_cgi_response(mock_cgi_output);
 
         let cgi_response = result.unwrap();
 
-        let expected_headers = CGIResponseHeaderMap::from([
-            (CGIResponseHeader::ContentType, String::from("text/html")),
-        ]);
+        let expected_headers = CGIResponseHeaderMap::from([(
+            CGIResponseHeader::ContentType,
+            String::from("text/html"),
+        )]);
 
-        let expected = CGIScriptResponse::new(
-            expected_headers,
-            String::from("Hello!")
-        );
+        let expected = CGIScriptResponse::new(expected_headers, String::from("Hello!"));
 
         assert_eq!(cgi_response, expected);
     }

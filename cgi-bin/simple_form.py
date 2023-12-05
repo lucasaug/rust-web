@@ -4,7 +4,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Import modules for CGI handling
-import cgi, cgitb
+import cgi
 
 # Create instance of FieldStorage
 form = cgi.FieldStorage()
@@ -13,13 +13,13 @@ form = cgi.FieldStorage()
 first_name = form.getvalue('first_name')
 last_name = form.getvalue('last_name')
 
-print ("Content-type:text/html")
+print("Content-type:text/html")
 print()
-print ("<html>")
-print ('<head>')
-print ("<title>Hello - CGI Program</title>")
-print ('</head>')
-print ('<body>')
-print ("<h2>Hello %s %s</h2>" % (first_name, last_name))
-print ('</body>')
-print ('</html>')
+print("<html>")
+print('<head>')
+print("<title>Greeter</title>")
+print('</head>')
+print('<body>')
+print("<h2>Hello %s %s</h2>" % (first_name, last_name))
+print('</body>')
+print('</html>')
