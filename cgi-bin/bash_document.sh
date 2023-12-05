@@ -2,7 +2,7 @@
 
 read INDATA
 printf "Content-Type: text/html\n\n"
-printf "Stdin data: ${INDATA}<br />"
+printf "Body: ${INDATA}<br />"
 export VAR=$(env)
 printf "${VAR//$'\n'/<br />}"
 

@@ -1,9 +1,22 @@
 <html>
     <head>
-        <title>Test</title>
+        <title>Sample pages</title>
     </head>
     <body>
-        <h1>Hello</h1>
+        <h1>Hello! Here is a list of the available sample pages:</h1>
+        <h2>Static pages</h2>
+        <ul>
+            <li>index.html (you are here)</li>
+            <li><a href="/simple_form.html">Simple form leading to a CGI page made with Python</a></li>
+            <li><a href="/document_form.html">Another simple form, now leading to a bash script which echoes its inputs (CGI headers and request body)</a></li>
+        </ul>
+        <h2>Dynamic pages</h2>
+        <ul>
+            <li><a href="/cgi-bin/bash_client_redirect.sh">CGI script returning a client redirect response to https://www.example.com</a></li>
+            <li><a href="/cgi-bin/bash_document.sh">CGI script which echoes its inputs (CGI headers and request body)</a></li>
+            <li><a href="/cgi-bin/bash_local_redirect.sh">CGI script returning a local redirect response which returns this index.html page</a></li>
+            <li><a href="/cgi-bin/simple_form.py">Python CGI script which returns a response depending on the received form data (None values are used if this page is accessed directly)</a></li>
+        </ul>
     </body>
 </html>
 
