@@ -22,7 +22,7 @@ To run in debug mode with logging:
 RUST_LOG=debug cargo run
 ```
 
-The server will be listening on port 8080. You can access `http://localhost:8080/` to get an overview of the built-in sample pages.
+The server will be listening on port 8080. You can access [http://localhost:8080/](http://localhost:8080/) to get an overview of the built-in sample pages.
 
 ## Usage
 
