@@ -22,11 +22,11 @@ To run in debug mode with logging:
 RUST_LOG=debug cargo run
 ```
 
-The server will be listening on port 8080.
+The server will be listening on port 8080. You can access `http://localhost:8080/` to get an overview of the built-in sample pages.
 
 ## Usage
 
-The static files are stored in the `public_html` folder and will be served at the root of the domain. The CGI executables are stored in the `cgi-bin` folder and will be server at the `/cgi-bin/` path of the domain. The user running the server binary should have execution permissions for the files in this folder (otherwise an HTTP 500 error will be returned). The server will listen on port 8080 by default. All these parameters can be changed by changing the corresponding constants in the `src/main.rs` file.
+The static files are stored in the `public_html` folder and will be served at the root of the domain. The CGI executables are stored in the `cgi-bin` folder and will be served at the `/cgi-bin/` path of the domain. The user running the server binary should have execution permissions for the files in this folder (otherwise a **500 Internal Server Error** will be returned). The server will listen on port 8080 by default. All these parameters can be changed by changing the corresponding constants in the `src/main.rs` file.
 
 See the files in the `cgi-bin` for some examples on how to write a CGI program.
 
