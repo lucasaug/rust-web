@@ -1,6 +1,6 @@
 # A minimalistic CGI-capable HTTP server in Rust
 
-This is a simple HTTP server with support for CGI programs written in Rust. It is side project of mine and an opportunity to put my Rust learning to the test. It is very limited, just for fun and not intended to be used in a production environment :)
+This is a simple HTTP server with support for CGI programs written in Rust. It is a side project of mine and an opportunity to put my Rust learning to the test. It is very limited, just for fun and not intended to be used in a production environment :)
 
 The [HTTP server implementation](https://doc.rust-lang.org/book/ch20-00-final-project-a-web-server.html) from the [Rust book](https://doc.rust-lang.org/book/) has been used as a starter code, and the `ThreadPool` implementation is exactly the same.
 
